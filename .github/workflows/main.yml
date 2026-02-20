@@ -1,0 +1,34 @@
+name: Build_mon_APK
+
+on:
+  push:
+    branches: [ "main" ] # Se déclenche quand vous envoyez vos fichiers sur main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4 # Récupère votre code
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Telecharger les packages
+        run: flutter pub get
+
+      - name: Fabriquer APK
+        run: flutter build apk --debug
+
+      - name: Sauvegarder l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: GregNotif-APK # Le nom du dossier que vous allez télécharger
+          path: build/app/outputs/flutter-apk/app-debug.apk
