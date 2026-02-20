@@ -2,13 +2,13 @@ name: Build_mon_APK
 
 on:
   push:
-    branches: [ "main" ] # Se déclenche quand vous envoyez vos fichiers sur main
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # Récupère votre code
+      - uses: actions/checkout@v4
 
       - name: Install Java
         uses: actions/setup-java@v4
@@ -19,16 +19,24 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.10.0'
           channel: 'stable'
 
       - name: Telecharger les packages
         run: flutter pub get
 
+      - name: Reparier Gradle (Force)
+        run: |
+          cd android
+          rm -rf .gradle
+          # Cette commande tente de mettre à jour la structure si elle est trop vieille
+          flutter core-devices --all || true 
+
       - name: Fabriquer APK
-        run: flutter build apk --debug
+        run: flutter build apk --debug --suppress-analytics
 
       - name: Sauvegarder l'APK
         uses: actions/upload-artifact@v4
         with:
-          name: GregNotif-APK # Le nom du dossier que vous allez télécharger
+          name: GregNotif-APK
           path: build/app/outputs/flutter-apk/app-debug.apk
